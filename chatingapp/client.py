@@ -6,13 +6,12 @@ client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 client_address = ("localhost", 9773)
 client_socket.connect(client_address)
-# client, address = server.accept()
 
 
 
 
 
-    # msg = client.recv(1024).decode('utf-8')
+
 
 msg = input ('msg:- ')
 if msg == 'quit':
