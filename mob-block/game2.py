@@ -20,7 +20,14 @@ def flip(sprite):
 
 
 def load_sprite_sheets(dir1, dir2, width, height, direction=False):
-    path = join("assets", dir1, dir2)
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    path = join(base_path, "assets", dir1, dir2)
+    print(f"Loading sprites from path: {path}")  # Debug print
+
+    if not os.path.exists(path):
+        print(f"Error: Path does not exist: {path}")
+        return {}
+
     images = [f for f in listdir(path) if isfile(join(path, f))]
 
     all_sprites = {}
@@ -55,7 +62,7 @@ def get_block(size):
 class Player(pygame.sprite.Sprite):
     COLOR = (255, 0, 0)
     GRAVITY = 1
-    SPRITES = load_sprite_sheets('MainCharcters', 'Maskdude', 32, 32, True)
+    SPRITES = load_sprite_sheets('MainCharacters', 'Maskdude', 32, 32, True)
 
     def __init__(self, x, y, width, height):
         super().__init__()
@@ -130,7 +137,7 @@ class Player(pygame.sprite.Sprite):
             elif self.jump_count == 2:
                 sprite_sheet = 'double_jump'
 
-        elif self.y_vel > self.GRAVITY * 2:#ITS USE TO 1PS  RESETS
+        elif self.y_vel > self.GRAVITY * 2:  # ITS USE TO 1PS RESETS
             sprite_sheet = 'fall'
 
         elif self.x_vel != 0:
@@ -171,18 +178,21 @@ class Block(Object):
         self.image.blit(block, (0, 0))
         self.mask = pygame.mask.from_surface(self.image)
 
+
 class Fire(Object):
     ANIMATION_DELAY = 3
-    def __init__(self, x, y, width, height, ):
+
+    def __init__(self, x, y, width, height):
         super().__init__(x, y, width, height, "fire")
-        self.fire = load_sprite_sheets("Traps", 'Fire' , width, height)
+        self.fire = load_sprite_sheets("Traps", 'Fire', width, height)
         self.image = self.fire['off'][0]
-        self.mask = pygame.mask. from_surface(self.image)
+        self.mask = pygame.mask.from_surface(self.image)
         self.animation_count = 0
         self.animation_name = 'off'
 
     def on(self):
         self.animation_name = 'on'
+
     def off(self):
         self.animation_name = 'off'
 
@@ -215,15 +225,16 @@ def handle_vertical_collision(player, objects, dy):
 
     return collided_objects
 
+
 def collide(player, objects, dx):
-    player.move(dx, 0 )
+    player.move(dx, 0)
     player.update()
     collided_object = None
     for obj in objects:
         if pygame.sprite.collide_mask(player, obj):
             collided_object = obj
             break
-    
+
     player.move(-dx, 0)
     player.update()
     return collided_object
@@ -231,7 +242,7 @@ def collide(player, objects, dx):
 
 def handle_move(player, objects):
     keys = pygame.key.get_pressed()
-    collide_left = collide(player, objects, -PLAYER_VEL)#space between block and player for adding more space just mulitplay the number with PLAYER_VEL
+    collide_left = collide(player, objects, -PLAYER_VEL)  # space between block and player for adding more space just multiply the number with PLAYER_VEL
     collide_right = collide(player, objects, PLAYER_VEL)
 
     player.x_vel = 0
@@ -240,11 +251,12 @@ def handle_move(player, objects):
     if keys[pygame.K_d] and not collide_right:
         player.move_right(PLAYER_VEL)
 
-    vertical_colldide = handle_vertical_collision(player, objects, player.y_vel)
-    to_check = [collide_left, collide_right, *vertical_colldide]
+    vertical_collide = handle_vertical_collision(player, objects, player.y_vel)
+    to_check = [collide_left, collide_right, *vertical_collide]
     for obj in to_check:
         if obj and obj.name == 'fire':
             player.make_hit()
+
 
 def get_background(name):
     image = pygame.image.load(os.path.join("assets", 'Background', name))
@@ -279,13 +291,13 @@ def main(window):
 
     player = Player(50, 50, 50, 50)
     # floor condition is to go the block left to right
-    fire = Fire(100, HEIGHT - block_size - 64, 16, 32 )#we see the size fo fire class  32, 64 from image
+    fire = Fire(100, HEIGHT - block_size - 64, 16, 32)  # we see the size of fire class 32, 64 from image
     fire.on()
     floor = [Block(i * block_size, HEIGHT - block_size, block_size) for i in
              range(-WIDTH // block_size, WIDTH * 2 // block_size)]
-    objects = [*floor, Block(0, HEIGHT - block_size * 2, block_size),fire,  Block(block_size * 3, HEIGHT - block_size * 4, block_size)
-               ,Block(block_size * 4, HEIGHT - block_size * 4, block_size), Block(block_size * 7, HEIGHT - block_size * 6, block_size)]
-    #location of the block for width and second for hight
+    objects = [*floor, Block(0, HEIGHT - block_size * 2, block_size), fire, Block(block_size * 3, HEIGHT - block_size * 4, block_size)
+        , Block(block_size * 4, HEIGHT - block_size * 4, block_size), Block(block_size * 7, HEIGHT - block_size * 6, block_size)]
+    # location of the block for width and second for height
     block = [Block(0, HEIGHT - block_size, block_size)]
 
     offset_x = 0
