@@ -1,4 +1,4 @@
-import qrcode 
+import qrcode
 
 # Create a QRCode object
 qr = qrcode.QRCode(
