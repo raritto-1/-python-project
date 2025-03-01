@@ -1,0 +1,2 @@
+clientid = e3183f70ea234edba7ec4e29de284f4d
+Client secret = 9b1528429d4a4fee9c20e06758d5fdff
